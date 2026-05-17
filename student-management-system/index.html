@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Manager</title>
+    <style>
+      body {
+        font-family: Arial;
+        background-color: #f4f4f4;
+        padding: 30px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+
+      .container {
+        width: 80%;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px gray;
+      }
+
+      input {
+        padding: 10px;
+        margin: 5px;
+        width: 200px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      button {
+        padding: 10px 15px;
+        margin: 5px;
+        border: none;
+        border-radius: 5px;
+        background-color: black;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        background-color: #444;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: white;
+      }
+
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 12px;
+        text-align: center;
+      }
+
+      th {
+        background-color: black;
+        color: white;
+      }
+
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      tr:hover {
+        background-color: #eaeaea;
+      }
+
+      #search {
+        width: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Student Management System</h1>
+      <input type="text" id="name" placeholder="Enter name" />
+      <input type="text" id="age" placeholder="Enter Age" />
+      <input type="text" id="branch" placeholder="Enter Branch" />
+      <button onclick="addStudent()">Add Student</button>
+      <br /><br />
+      <input
+        type="text"
+        id="search"
+        placeholder="Search Name"
+        onkeyup="searchStudent()"
+      />
+
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Branch</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <script>
+      let students = JSON.parse(localStorage.getItem("students")) || [];
+      window.onload = function () {
+        displayStudents();
+      };
+      function addStudent() {
+        let name = document.getElementById("name").value;
+        let age = document.getElementById("age").value;
+        let branch = document.getElementById("branch").value;
+
+        if (name == "" || age == "" || branch == "") {
+          alert("Please fill all fields");
+          return;
+        }
+
+        let student = {
+          name: name,
+          age: age,
+          branch: branch,
+        };
+        students.push(student);
+        localStorage.setItem("students", JSON.stringify(students));
+        displayStudents();
+        clearInputs();
+      }
+      function displayStudents() {
+        let tableBody = document.getElementById("tableBody");
+        tableBody.innerHTML = "";
+        students.forEach(function (student, index) {
+          let tr = document.createElement("tr");
+          let td1 = document.createElement("td");
+          td1.textContent = student.name;
+          let td2 = document.createElement("td");
+          td2.textContent = student.age;
+          let td3 = document.createElement("td");
+          td3.textContent = student.branch;
+
+          let td4 = document.createElement("td");
+
+          let dltBtn = document.createElement("button");
+          dltBtn.textContent = "Delete";
+
+          dltBtn.onclick = function () {
+            deleteStudent(index);
+          };
+          let editBtn = document.createElement("button");
+          editBtn.textContent = "Edit";
+          editBtn.onclick = function () {
+            editStudent(index);
+          };
+          td4.appendChild(editBtn);
+          td4.appendChild(dltBtn);
+
+          tr.appendChild(td1);
+          tr.appendChild(td2);
+          tr.appendChild(td3);
+          tr.appendChild(td4);
+
+          tableBody.appendChild(tr);
+        });
+      }
+      function deleteStudent(index) {
+        students.splice(index, 1);
+        localStorage.setItem("students",JSON.stringify(students));
+        displayStudents();
+      }
+      function editStudent(index) {
+        let student = students[index];
+        document.getElementById("name").value = student.name;
+        document.getElementById("age").value = student.age;
+        document.getElementById("branch").value = student.branch;
+        students.splice(index, 1);
+        localStorage.setItem("students", JSON.stringify(students));
+        displayStudents();
+      }
+      function clearInputs() {
+        document.getElementById("name").value = "";
+        document.getElementById("age").value = "";
+        document.getElementById("branch").value = "";
+      }
+      function searchStudent() {
+        let search = document.getElementById("search").value.toLowerCase();
+        let rows = document.querySelectorAll("tbody tr");
+        rows.forEach(function(row) {
+          let name = row.children[0].textContent.toLowerCase();
+          if (name.includes(search)) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
